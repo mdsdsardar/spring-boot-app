@@ -29,7 +29,7 @@ jobs:
 
     - name: Create Lightsail Instance
       run: |
-        INSTANCE_NAME="my-lightsail-instance"
+        INSTANCE_NAME="saad-lightsail-java"
         BUNDLE_ID="micro_3_1"  # Specify the instance plan
         BLUEPRINT_ID="amazon_linux_2"  # Specify the instance OS
         AWS_REGION="ap-south-1"
