@@ -1,0 +1,53 @@
+name: Create AWS Lightsail Instance
+
+on:
+  workflow_dispatch:
+  #push:
+    #branches:
+      #- main  # Trigger the workflow on push to the main branch
+
+jobs:
+  create-lightsail-instance:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: "ap-south-1"
+
+    - name: Create Lightsail Instance
+      run: |
+        INSTANCE_NAME="my-lightsail-instance"
+        BUNDLE_ID="nano_2_0"  # Specify the instance plan
+        BLUEPRINT_ID="amazon_linux_2"  # Specify the instance OS
+        AWS_REGION="ap-south-1"
+        USER_DATA=$(base64 -w 0 < launch-script.sh)
+
+        aws lightsail create-instances \
+          --instance-names $INSTANCE_NAME \
+          --availability-zone ${AWS_REGION}a \
+          --bundle-id $BUNDLE_ID \
+          --blueprint-id $BLUEPRINT_ID
+          --user-data $USER_DATA
+
+    - name: Wait for Instance to be Running
+      run: |
+        INSTANCE_NAME="my-lightsail-instance"
+        STATE="pending"
+        while [ "$STATE" != "running" ]; do
+          sleep 60
+          STATE=$(aws lightsail get-instance-state --instance-name $INSTANCE_NAME --query 'state.name' --output text)
+          echo "Current state: $STATE"
+        done
+
+    - name: Get Instance IP Address
+      run: |
+        INSTANCE_NAME="my-lightsail-instance"
+        IP_ADDRESS=$(aws lightsail get-instance --instance-name $INSTANCE_NAME --query 'instance.publicIpAddress' --output text)
+        echo "Instance IP Address: $IP_ADDRESS"
