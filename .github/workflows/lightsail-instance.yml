@@ -24,7 +24,7 @@ jobs:
     - name: Create Lightsail Instance
       run: |
         INSTANCE_NAME="my-lightsail-instance"
-        BUNDLE_ID="nano_2_0"  # Specify the instance plan
+        BUNDLE_ID="micro_3_1"  # Specify the instance plan
         BLUEPRINT_ID="amazon_linux_2"  # Specify the instance OS
         AWS_REGION="ap-south-1"
         USER_DATA=$(base64 -w 0 < launch-script.sh)
