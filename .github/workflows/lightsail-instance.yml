@@ -19,6 +19,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: "ap-south-1"
 
     - name: Read and Base64 Encode Launch Script
       id: encode_script
@@ -32,7 +33,6 @@ jobs:
         INSTANCE_NAME="saad-lightsail-java"
         BUNDLE_ID="micro_3_1"  # Specify the instance plan
         BLUEPRINT_ID="amazon_linux_2"  # Specify the instance OS
-        AWS_REGION="ap-south-1"
         USER_DATA=${{ steps.encode_script.outputs.user_data }}
 
         aws lightsail create-instances \
