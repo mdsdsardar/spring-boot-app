@@ -38,7 +38,7 @@ jobs:
           --availability-zone ${AWS_REGION}a \
           --bundle-id $BUNDLE_ID \
           --blueprint-id $BLUEPRINT_ID
-          --user-data "${USER_DATA}"
+          --user-data "$USER_DATA"
 
     - name: Wait for Instance to be Running
       run: |
