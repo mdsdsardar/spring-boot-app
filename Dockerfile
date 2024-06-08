@@ -1,29 +1,28 @@
-# Use an official OpenJDK 11 runtime as a parent image
-FROM openjdk:11-jdk-slim
+# Stage 1: Build the application with Maven
+FROM maven:3.8.1-openjdk-11-slim AS build
 
-# Set the working directory in the container
+# Set the working directory for the build stage
 WORKDIR /app
 
-# Install Maven
-RUN apt-get update && \
-    apt-get install -y maven && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy the pom.xml and the source code
+COPY pom.xml ./
+COPY src ./src
 
 # Package the application using Maven
 RUN mvn clean package -DskipTests
 
-# Specify the JAR file
-ARG JAR_FILE=target/*.jar
+# Stage 2: Create the runtime image
+FROM openjdk:11-jdk-slim
 
-# Copy the JAR file to the docker image
-COPY ${JAR_FILE} app.jar
+# Set the working directory for the runtime stage
+WORKDIR /app
+
+# Copy the JAR file from the build stage
+COPY --from=build /app/target/*.jar app.jar
 
 # Expose the port the app runs on
 EXPOSE 8080
 
-# Run the jar file
-ENTRYPOINT ["java","-jar","/app.jar"]
+# Run the JAR file
+ENTRYPOINT ["java","-jar","app.jar"]
 
