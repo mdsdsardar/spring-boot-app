@@ -13,3 +13,4 @@ resource "aws_lightsail_instance" "my_instance" {
   tags = {
     Name = "MyLightsailInstance"
   }
+}
