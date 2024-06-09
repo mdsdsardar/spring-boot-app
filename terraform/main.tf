@@ -20,7 +20,7 @@ resource "aws_lightsail_instance_public_ports" "my_instance_ports" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_list   = ["0.0.0.0/0"]
+    cidrs       = ["0.0.0.0/0"]
   }
 
   depends_on = [aws_lightsail_instance.my_instance]
