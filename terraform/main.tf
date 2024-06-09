@@ -14,3 +14,12 @@ resource "aws_lightsail_instance" "my_instance" {
     Name = "MyLightsailInstance"
   }
 }
+data "aws_lightsail_instance" "my_instance" {
+  name = aws_lightsail_instance.my_instance.name
+
+  depends_on = [aws_lightsail_instance.my_instance]
+}
+
+output "instance_public_ip" {
+  value = data.aws_lightsail_instance.my_instance.public_ip_address
+}
