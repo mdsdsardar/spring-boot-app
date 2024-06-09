@@ -5,7 +5,6 @@ on:
     inputs:
       s3:
         description: 'Create s3 bucket'
-        required: true
         default: 'no'
         type: choice
         options:
