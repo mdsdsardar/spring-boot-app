@@ -2,9 +2,6 @@ name: Create AWS Lightsail Instance
 
 on:
   workflow_dispatch:
-  #push:
-    #branches:
-      #- main  # Trigger the workflow on push to the main branch
 
 jobs:
   create-lightsail-instance:
@@ -14,32 +11,27 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Set Up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Use the appropriate Python version
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install boto3
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: "ap-south-1"
-
-    - name: Read and Base64 Encode Launch Script
-      id: encode_script
-      run: |
-        USER_DATA=$(base64 -w 0 < launch-script.sh)
-        echo "USER_DATA=${USER_DATA}" >> $GITHUB_ENV
-
-    - name: Create Lightsail Instance
-      run: |
-        INSTANCE_NAME="saad-lightsail-java"
-        BUNDLE_ID="micro_3_1"  # Specify the instance plan
-        BLUEPRINT_ID="amazon_linux_2"  # Specify the instance OS
-        USER_DATA=${{ env.USER_DATA }}
         
-        aws lightsail create-instances \
-          --instance-names $INSTANCE_NAME \
-          --availability-zone ${AWS_REGION}a \
-          --bundle-id $BUNDLE_ID \
-          --blueprint-id $BLUEPRINT_ID
-          --user-data "$USER_DATA"
+    - name: Run Python Script
+      env:
+        AWS_REGION: ${AWS_REGION}
+      run: python script.py
 
     - name: Wait for Instance to be Running
       run: |
