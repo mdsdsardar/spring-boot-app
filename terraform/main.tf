@@ -13,6 +13,20 @@ resource "aws_lightsail_instance" "my_instance" {
   }
 }
 
+resource "aws_lightsail_instance_public_ports" "my_instance_ports" {
+  instance_name = aws_lightsail_instance.my_instance.name
+
+  port_info {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_list   = ["0.0.0.0/0"]
+  }
+
+  depends_on = [aws_lightsail_instance.my_instance]
+}
+
+
 output "instance_public_ip" {	
   value = resource.aws_lightsail_instance.my_instance.public_ip_address	
 }
