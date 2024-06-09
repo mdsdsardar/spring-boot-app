@@ -35,7 +35,7 @@ jobs:
 
     - name: Wait for Instance to be Running
       run: |
-        INSTANCE_NAME="my-lightsail-instance"
+        INSTANCE_NAME="saad-lightsail-instance"
         STATE="pending"
         while [ "$STATE" != "running" ]; do
           sleep 60
@@ -45,6 +45,6 @@ jobs:
 
     - name: Get Instance IP Address
       run: |
-        INSTANCE_NAME="my-lightsail-instance"
+        INSTANCE_NAME="saad-lightsail-instance"
         IP_ADDRESS=$(aws lightsail get-instance --instance-name $INSTANCE_NAME --query 'instance.publicIpAddress' --output text)
         echo "Instance IP Address: $IP_ADDRESS"
