@@ -14,5 +14,5 @@ resource "aws_lightsail_instance" "my_instance" {
 }
 
 output "instance_public_ip" {	
-  value = data.aws_lightsail_instance.my_instance.public_ip_address	
+  value = resource.aws_lightsail_instance.my_instance.public_ip_address	
 }
