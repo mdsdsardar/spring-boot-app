@@ -2,7 +2,7 @@ terraform {
   backend "s3"{
     bucket                 = "saadterraform"
     region                 = "ap-south-1"
-    key                    = "backend.tfstate"
+    key                    = "spring.tfstate"
   }
 }
 provider "aws" {
