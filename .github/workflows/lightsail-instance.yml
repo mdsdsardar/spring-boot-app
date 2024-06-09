@@ -32,13 +32,14 @@ jobs:
         INSTANCE_NAME="saad-lightsail-java"
         BUNDLE_ID="micro_3_1"  # Specify the instance plan
         BLUEPRINT_ID="amazon_linux_2"  # Specify the instance OS
+        USER_DATA=${{ env.USER_DATA }}
         
         aws lightsail create-instances \
           --instance-names $INSTANCE_NAME \
           --availability-zone ${AWS_REGION}a \
           --bundle-id $BUNDLE_ID \
           --blueprint-id $BLUEPRINT_ID
-          [--user-data "$USER_DATA"]
+          --user-data "$USER_DATA"
 
     - name: Wait for Instance to be Running
       run: |
