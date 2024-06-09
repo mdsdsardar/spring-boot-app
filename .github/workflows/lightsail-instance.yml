@@ -2,49 +2,57 @@ name: Create AWS Lightsail Instance
 
 on:
   workflow_dispatch:
-
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+          
 jobs:
-  create-lightsail-instance:
+  terraform:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set Up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'  # Use the appropriate Python version
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install boto3
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: "ap-south-1"
-        
-    - name: Run Python Script
+    - name: Terraform Init
+      run: terraform init
       env:
-        AWS_REGION: ${AWS_REGION}
-      run: python script.py
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      working-directory: ./terraform
+      
+    - name: Terraform Plan
+      #if: github.event.inputs.action == 'apply'
+      run: terraform plan -out=plan.tfplan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      working-directory: ./terraform
 
-    - name: Wait for Instance to be Running
-      run: |
-        INSTANCE_NAME="saad-lightsail-instance"
-        STATE="pending"
-        while [ "$STATE" != "running" ]; do
-          sleep 60
-          STATE=$(aws lightsail get-instance-state --instance-name $INSTANCE_NAME --query 'state.name' --output text)
-          echo "Current state: $STATE"
-        done
+    - name: Terraform Apply
+      if: github.event.inputs.action == 'apply'
+      run: terraform apply -auto-approve plan.tfplan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      working-directory: ./terraform
 
-    - name: Get Instance IP Address
-      run: |
-        INSTANCE_NAME="saad-lightsail-instance"
-        IP_ADDRESS=$(aws lightsail get-instance --instance-name $INSTANCE_NAME --query 'instance.publicIpAddress' --output text)
-        echo "Instance IP Address: $IP_ADDRESS"
+    - name: Remove Terraform Plan File
+      #if: github.event.inputs.action == 'apply'
+      run: rm plan.tfplan
+      working-directory: ./terraform
+
+
+    - name: Terraform Destroy
+      if: github.event.inputs.action == 'destroy'
+      run: terraform destroy -auto-approve
+      working-directory: ./terraform
