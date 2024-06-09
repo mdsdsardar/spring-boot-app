@@ -7,6 +7,6 @@ sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 git clone https://github.com/mdsdsardar/spring-boot-app.git
-cd spring-boot-app
+cd spring-boot-app/terraform/
 docker-compose up -d
 sleep 60
