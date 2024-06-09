@@ -1,3 +1,10 @@
+terraform {
+  backend "s3"{
+    bucket                 = "saadterraform"
+    region                 = "ap-south-1"
+    key                    = "backend.tfstate"
+  }
+}
 provider "aws" {
   region = "ap-south-1"
 }
